@@ -1,0 +1,43 @@
+# Cura
+
+## Start GCODE
+M140 S{material_bed_temperature_layer_0}
+PRINT_START BED_TEMP={material_bed_temperature_layer_0} EXTRUDER={initial_extruder_nr} EXTRUDER_TEMP={material_print_temperature_layer_0, initial_extruder_nr}
+
+## End GCODE
+PRINT_END
+
+
+
+# PrusaSlicer
+
+## Start GCODE
+; Have to specify M140/M109 else PrusaSlicer will insert them itself. This way we include them where they don't interfere
+M140 S[first_layer_bed_temperature]
+PRINT_START BED_TEMP=[first_layer_bed_temperature] EXTRUDER=[next_extruder] EXTRUDER_TEMP=[first_layer_temperature_[next_extruder]]
+M109 S[first_layer_temperature_[next_extruder]]
+
+## End GCODE
+PRINT_END
+
+## Toolchange GCODE
+; Start warming up the next extruder from parking temp asap
+M104 T[next_extruder] S[temperature_[next_extruder]]
+; Cool down inactive extruder to parking temperature to prevent filament cooking
+; Needs to fetch from variable as this is material dependant (e.g. PETG is 120, and ABS is 190)
+M104 T[previous_extruder] S175
+; Due to PrusaSlicer not controlling separate tool fans, the Tx macro will automatically swop the cooling fan over.
+T[next_extruder]
+; Wait for temps - need to handle minimum print start temp (e.g. -10C) in a klipper macro
+M109 T[next_extruder] S[temperature_[next_extruder]]
+
+
+
+M104 T[next_extruder] S[temperature_[next_extruder]]
+PARK_T[previous_extruder] 
+T[next_extruder]
+PREPARE_T[next_extruder] TEMP=[temperature_[next_extruder]]
+
+
+
+

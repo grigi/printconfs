@@ -1,2 +1,4 @@
-# printconfs
-Custom printer configurations
+# Custom printer configurations
+
+Including many macros for Klipper
+
